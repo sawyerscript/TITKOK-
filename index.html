@@ -1,53 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>STATUS_IDLE</title>
+    <title>TikTok Bridge</title>
     <script src="https://cdn.jsdelivr.net/npm/tiktok-live-connector@latest/dist/browser-index.min.js"></script>
+    <style>
+        body { background: #111; color: white; font-family: sans-serif; text-align: center; padding: 50px; }
+        button { 
+            padding: 20px 40px; font-size: 20px; cursor: pointer; 
+            background: #ff0050; color: white; border: none; border-radius: 10px;
+            margin-top: 20px;
+        }
+        button:active { background: #00f2ea; }
+        #state { color: #ff0050; }
+    </style>
 </head>
-<body style="background:#111; color:white; font-family:sans-serif; text-align:center; padding:50px;">
-    <h1>TikTok Bridge: hybetember04</h1>
-    <h2 id="state" style="color: #ff0050;">Connecting...</h2>
-    <p id="log">Waiting for Rose...</p>
+<body>
+    <h1>TikTok to Roblox Bridge</h1>
+    <h2 id="state">Connecting...</h2>
+    
+    <button onclick="sendTrigger('MANUAL_TEST')">SEND TEST ROSE</button>
+    
+    <p id="log">Waiting for events...</p>
 
     <script>
         const TIKTOK_USERNAME = "hybetember04";
-        const WEBHOOK_URL = "https://discord.com/api/webhooks/1487331088463429662/BSljjVCBYLhhQWT6BuNMGG0nn0dg4pYPp54YaMvfV3KVA-w98Y4Zdy28rARgmc_KTZUY";
+        const WEBHOOK_URL = "https://webhook.lewisakura.moe/api/webhooks/1487331088463429662/BSljjVCBYLhhQWT6BuNMGG0nn0dg4pYPp54YaMvfV3KVA-w98Y4Zdy28rARgmc_KTZUY";
 
         const connection = new TikTokLiveConnector.TikTokLiveConnection(TIKTOK_USERNAME);
 
-        function sendDiscord(message) {
+        function sendTrigger(type) {
+            const uniqueID = Date.now(); // This stops the spam exploding
+            const payload = {
+                content: "TRIGGER_" + type + "_" + uniqueID
+            };
+
             fetch(WEBHOOK_URL, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ content: message })
-            }).catch(e => console.error("Discord Error:", e));
+                body: JSON.stringify(payload)
+            }).then(() => {
+                document.getElementById('log').innerText = "Sent: " + type;
+            });
         }
 
         connection.connect().then(() => {
             document.getElementById('state').innerText = "CONNECTED";
             document.getElementById('state').style.color = "#00f2ea";
-            sendDiscord("🚀 **Bridge Online!** Watching @hybetember04 for Roses...");
-        }).catch(err => {
-            document.getElementById('state').innerText = "CONNECTION FAILED";
         });
 
         connection.on('gift', data => {
             if (data.giftName === "Rose") {
-                // Signal for Roblox
-                document.title = "STATUS_ROSE";
-                
-                // Visual feedback
-                document.getElementById('log').innerText = "ROSE DETECTED!";
-                document.body.style.backgroundColor = "#ff0050";
-                
-                // Discord notification
-                sendDiscord("🌹 **Rose Received!** Triggering Roblox explosion...");
-
-                setTimeout(() => {
-                    document.title = "STATUS_IDLE";
-                    document.getElementById('log').innerText = "Waiting for Rose...";
-                    document.body.style.backgroundColor = "#111";
-                }, 2000);
+                sendTrigger("ROSE");
             }
         });
     </script>
