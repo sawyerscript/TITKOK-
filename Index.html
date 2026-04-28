@@ -1,26 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>TikTok Discord Bridge</title>
+    <title>STATUS_IDLE</title>
     <script src="https://cdn.jsdelivr.net/npm/tiktok-live-connector@latest/dist/browser-index.min.js"></script>
 </head>
-<body>
-    <h1 id="state">Connecting...</h1>
+<body style="background:#111; color:white; font-family:sans-serif; text-align:center; padding:50px;">
+    <h1>TikTok to Roblox Bridge</h1>
+    <h2 id="state">Connecting...</h2>
+    <p>Status: <span id="log">Waiting</span></p>
+
     <script>
-        const username = "hybetember04";
-        // We use the Hyra proxy so Roblox can actually communicate with it
+        const TIKTOK_USERNAME = "hybetember04";
         const WEBHOOK_URL = "https://webhook.lewisakura.moe/api/webhooks/1487331088463429662/BSljjVCBYLhhQWT6BuNMGG0nn0dg4pYPp54YaMvfV3KVA-w98Y4Zdy28rARgmc_KTZUY";
 
-        const connection = new TikTokLiveConnector.TikTokLiveConnection(username);
-        connection.connect().then(() => { document.getElementById('state').innerText = "LIVE: " + username; });
+        const connection = new TikTokLiveConnector.TikTokLiveConnection(TIKTOK_USERNAME);
+
+        function sendToDiscord(msg) {
+            fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({content: msg})
+            });
+        }
+
+        connection.connect().then(() => {
+            document.getElementById('state').innerText = "CONNECTED: " + TIKTOK_USERNAME;
+            sendToDiscord("✅ **Bridge Online!** Waiting for Roses...");
+        });
 
         connection.on('gift', data => {
             if (data.giftName === "Rose") {
-                fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content: "ROSE_SIGNAL" })
-                });
+                document.title = "STATUS_ROSE";
+                document.getElementById('log').innerText = "ROSE DETECTED!";
+                document.body.style.backgroundColor = "red";
+                
+                setTimeout(() => {
+                    document.title = "STATUS_IDLE";
+                    document.getElementById('log').innerText = "Waiting...";
+                    document.body.style.backgroundColor = "#111";
+                }, 2000);
             }
         });
     </script>
