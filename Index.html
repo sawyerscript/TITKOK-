@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TikTok Bridge</title>
+    <script src="https://cdn.jsdelivr.net/npm/tiktok-live-connector@latest/dist/browser-index.min.js"></script>
+</head>
+<body>
+    <h1 id="state">Connecting...</h1>
+    <script>
+        const username = "hybetember04"; // <--- CHANGE THIS
+        const connection = new TikTokLiveConnector.TikTokLiveConnection(username);
+        
+        // This is what Roblox will read
+        window.status = "false";
+
+        connection.connect().then(() => {
+            document.getElementById('state').innerText = "Connected to " + username;
+        });
+
+        connection.on('gift', data => {
+            if (data.giftName === "Rose") {
+                window.status = "true";
+                document.body.style.backgroundColor = "red"; // Visual cue
+                setTimeout(() => { 
+                    window.status = "false"; 
+                    document.body.style.backgroundColor = "white";
+                }, 2000);
+            }
+        });
+
+        // This allows the Roblox HttpGet to see the "true" or "false"
+        setInterval(() => {
+            document.title = window.status;
+        }, 100);
+    </script>
+</body>
+</html>
