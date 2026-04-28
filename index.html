@@ -4,22 +4,23 @@
     <title>TikTok Bridge</title>
     <script src="https://cdn.jsdelivr.net/npm/tiktok-live-connector@latest/dist/browser-index.min.js"></script>
     <style>
-        body { background: #111; color: white; font-family: sans-serif; text-align: center; padding: 50px; }
-        button { 
-            padding: 20px 40px; font-size: 20px; cursor: pointer; 
-            background: #ff0050; color: white; border: none; border-radius: 10px;
-            margin-top: 20px;
+        body { background: #111; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 50px; }
+        .btn { 
+            padding: 20px 40px; font-size: 22px; cursor: pointer; 
+            background: #00f2ea; color: #000; border: none; border-radius: 12px;
+            font-weight: bold; margin-top: 20px; transition: 0.2s;
         }
-        button:active { background: #00f2ea; }
-        #state { color: #ff0050; }
+        .btn:hover { background: #ff0050; color: white; transform: scale(1.05); }
+        #state { color: #ff0050; margin-top: 20px; }
+        #log { color: #888; margin-top: 10px; }
     </style>
 </head>
 <body>
     <h1>TikTok to Roblox Bridge</h1>
+    
+    <button class="btn" onclick="sendTrigger('TEST_BUTTON')">SEND TEST WEBHOOK</button>
+    
     <h2 id="state">Connecting...</h2>
-    
-    <button onclick="sendTrigger('MANUAL_TEST')">SEND TEST ROSE</button>
-    
     <p id="log">Waiting for events...</p>
 
     <script>
@@ -29,7 +30,7 @@
         const connection = new TikTokLiveConnector.TikTokLiveConnection(TIKTOK_USERNAME);
 
         function sendTrigger(type) {
-            const uniqueID = Date.now(); // This stops the spam exploding
+            const uniqueID = Date.now(); 
             const payload = {
                 content: "TRIGGER_" + type + "_" + uniqueID
             };
@@ -39,13 +40,17 @@
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(payload)
             }).then(() => {
-                document.getElementById('log').innerText = "Sent: " + type;
+                document.getElementById('log').innerText = "Last Signal: " + type + " (" + uniqueID + ")";
             });
         }
 
+        // Automatic test when page opens
         connection.connect().then(() => {
-            document.getElementById('state').innerText = "CONNECTED";
+            document.getElementById('state').innerText = "CONNECTED: " + TIKTOK_USERNAME;
             document.getElementById('state').style.color = "#00f2ea";
+            sendTrigger("BRIDGE_ONLINE"); // Send initial test webhook automatically
+        }).catch(err => {
+            document.getElementById('state').innerText = "FAILED TO CONNECT";
         });
 
         connection.on('gift', data => {
