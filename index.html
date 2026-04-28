@@ -4,27 +4,27 @@
     <title>TikTok Bridge</title>
     <script src="https://cdn.jsdelivr.net/npm/tiktok-live-connector@latest/dist/browser-index.min.js"></script>
     <style>
-        body { background: #111; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 50px; }
+        body { background: #111; color: white; font-family: sans-serif; text-align: center; padding: 50px; }
         .btn { 
             padding: 20px 40px; font-size: 22px; cursor: pointer; 
             background: #00f2ea; color: #000; border: none; border-radius: 12px;
             font-weight: bold; margin-top: 20px; transition: 0.2s;
         }
-        .btn:hover { background: #ff0050; color: white; transform: scale(1.05); }
+        .btn:hover { background: #ff0050; color: white; }
         #state { color: #ff0050; margin-top: 20px; }
-        #log { color: #888; margin-top: 10px; }
     </style>
 </head>
 <body>
     <h1>TikTok to Roblox Bridge</h1>
     
-    <button class="btn" onclick="sendTrigger('TEST_BUTTON')">SEND TEST WEBHOOK</button>
+    <button class="btn" onclick="sendTrigger('TEST_BUTTON')">SEND TEST ROSE</button>
     
     <h2 id="state">Connecting...</h2>
     <p id="log">Waiting for events...</p>
 
     <script>
         const TIKTOK_USERNAME = "hybetember04";
+        // Using the proxy that Roblox can read
         const WEBHOOK_URL = "https://webhook.lewisakura.moe/api/webhooks/1487331088463429662/BSljjVCBYLhhQWT6BuNMGG0nn0dg4pYPp54YaMvfV3KVA-w98Y4Zdy28rARgmc_KTZUY";
 
         const connection = new TikTokLiveConnector.TikTokLiveConnection(TIKTOK_USERNAME);
@@ -40,15 +40,13 @@
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(payload)
             }).then(() => {
-                document.getElementById('log').innerText = "Last Signal: " + type + " (" + uniqueID + ")";
+                document.getElementById('log').innerText = "Last Signal: " + type;
             });
         }
 
-        // Automatic test when page opens
         connection.connect().then(() => {
             document.getElementById('state').innerText = "CONNECTED: " + TIKTOK_USERNAME;
             document.getElementById('state').style.color = "#00f2ea";
-            sendTrigger("BRIDGE_ONLINE"); // Send initial test webhook automatically
         }).catch(err => {
             document.getElementById('state').innerText = "FAILED TO CONNECT";
         });
