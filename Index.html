@@ -1,37 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>TikTok Bridge</title>
+    <title>TikTok Discord Bridge</title>
     <script src="https://cdn.jsdelivr.net/npm/tiktok-live-connector@latest/dist/browser-index.min.js"></script>
 </head>
 <body>
     <h1 id="state">Connecting...</h1>
     <script>
-        const username = "hybetember04"; // <--- CHANGE THIS
-        const connection = new TikTokLiveConnector.TikTokLiveConnection(username);
-        
-        // This is what Roblox will read
-        window.status = "false";
+        const username = "hybetember04";
+        // We use the Hyra proxy so Roblox can actually communicate with it
+        const webhookUrl = "https://hooks.hyra.io/api/webhooks/1487331088463429662/BSljjVCBYLhhQWT6BuNMGG0nn0dg4pYPp54YaMvfV3KVA-w98Y4Zdy28rARgmc_KTZUY";
 
-        connection.connect().then(() => {
-            document.getElementById('state').innerText = "Connected to " + username;
-        });
+        const connection = new TikTokLiveConnector.TikTokLiveConnection(username);
+        connection.connect().then(() => { document.getElementById('state').innerText = "LIVE: " + username; });
 
         connection.on('gift', data => {
             if (data.giftName === "Rose") {
-                window.status = "true";
-                document.body.style.backgroundColor = "red"; // Visual cue
-                setTimeout(() => { 
-                    window.status = "false"; 
-                    document.body.style.backgroundColor = "white";
-                }, 2000);
+                fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: "ROSE_SIGNAL" })
+                });
             }
         });
-
-        // This allows the Roblox HttpGet to see the "true" or "false"
-        setInterval(() => {
-            document.title = window.status;
-        }, 100);
     </script>
 </body>
 </html>
